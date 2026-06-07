@@ -1,0 +1,29 @@
+# Runtime state
+data/
+*.sqlite
+*.sqlite-shm
+*.sqlite-wal
+
+# Generated audio/cache assets
+audio/default/
+audio/us/
+audio/tts/
+audio/sentences/
+audio/preview/
+audio/download-report.json
+
+# Local environment and logs
+.env
+.env.*
+*.log
+npm-debug.log*
+
+# OS/editor noise
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Temporary files
+*.tmp
+*.bak

@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>红宝书考研词汇星空</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <canvas id="space" aria-label="红宝书考研词汇星空"></canvas>
+
+    <aside class="panel left-panel">
+      <div class="brand">
+        <div>
+          <p class="eyebrow">Kaoyan Vocabulary Universe</p>
+          <h1>红宝书词汇星空</h1>
+        </div>
+        <span id="learnedCount">0/0</span>
+      </div>
+
+      <div class="segmented" role="tablist" aria-label="浏览方式">
+        <button class="active" data-view="units" type="button">单元</button>
+        <button data-view="themes" type="button">主题</button>
+        <button data-view="study" type="button">学习</button>
+      </div>
+
+      <label class="search-box">
+        <span>搜索</span>
+        <input id="searchInput" type="search" placeholder="输入单词、词根或中文释义" />
+      </label>
+
+      <div class="import-row">
+        <label class="file-button">
+          增量导入
+          <input id="csvInput" type="file" accept=".csv,text/csv" />
+        </label>
+        <button id="exportData" type="button">导出总词库</button>
+        <button id="resetData" type="button">恢复示例</button>
+        <button id="clearBank" type="button">清空缓存</button>
+      </div>
+
+      <div id="groupList" class="group-list"></div>
+    </aside>
+
+    <section class="panel detail-panel" id="detailPanel" aria-live="polite">
+      <button id="closeDetail" class="icon-button close-button" type="button" aria-label="关闭词卡">x</button>
+      <p class="eyebrow" id="detailUnit">Unit 01</p>
+      <div class="word-title">
+        <div>
+          <h2 id="detailWord">radiat</h2>
+          <p class="phonetic-line">
+            <span id="detailPhonetic">/ˈreɪdiət/</span>
+            <button id="speakButton" class="speak-button" type="button" aria-label="播放美式发音">美音</button>
+          </p>
+        </div>
+        <button id="learnButton" type="button">标记已学</button>
+      </div>
+      <p class="meaning" id="detailMeaning"></p>
+
+      <div class="section">
+        <h3>词源拆解</h3>
+        <div id="morphemes" class="morphemes"></div>
+      </div>
+
+      <div class="section">
+        <h3>记忆故事</h3>
+        <p id="memoryText" class="memory-text"></p>
+      </div>
+
+      <div class="section" id="exampleSection">
+        <div class="section-heading">
+          <h3>例句</h3>
+          <div class="example-actions">
+            <div id="ttsProviderSelect" class="tts-provider" role="group" aria-label="TTS来源">
+              <button class="active" type="button" data-provider="qwen">Qwen3</button>
+              <button type="button" data-provider="openai">OpenAI</button>
+            </div>
+            <button id="speakExampleButton" class="speak-button" type="button">读例句</button>
+          </div>
+        </div>
+        <p id="exampleEn" class="example-en"></p>
+        <p id="exampleZh" class="example-zh"></p>
+      </div>
+
+      <div class="section">
+        <h3>星轨关联</h3>
+        <div id="relatedWords" class="chips"></div>
+      </div>
+    </section>
+
+    <section class="panel study-panel" id="studyPanel" hidden>
+      <div class="study-head">
+        <div>
+          <p class="eyebrow">Daily Study</p>
+          <h2>今日学习</h2>
+        </div>
+        <button id="closeStudy" class="icon-button close-button" type="button" aria-label="关闭学习">x</button>
+      </div>
+      <div class="study-settings">
+        <label><span>每日新词</span><input id="dailyNewInput" type="number" min="1" max="300" step="1" value="30" /></label>
+        <label><span>复习上限</span><input id="dailyReviewInput" type="number" min="0" max="1000" step="10" value="200" /></label>
+        <button id="saveStudySettings" type="button">保存</button>
+      </div>
+      <div class="study-mode-picker" id="studyModePicker" aria-label="学习题型">
+        <button class="active" data-mode="flip" type="button">翻卡</button>
+        <button data-mode="word_to_meaning" type="button">词辨意</button>
+        <button data-mode="meaning_to_word" type="button">意辨词</button>
+        <button data-mode="spelling" type="button">拼写</button>
+        <button data-mode="audio_to_word" type="button">听音</button>
+      </div>
+      <div class="study-stats" id="studyStats"></div>
+      <div class="study-card" id="studyCard">
+        <p class="eyebrow" id="studyModeLabel">READY</p>
+        <h3 id="studyPrompt">点击开始今日学习</h3>
+        <p id="studySubPrompt"></p>
+        <div id="studyOptions" class="study-options"></div>
+        <div id="studyAnswer" class="study-answer" hidden></div>
+      </div>
+      <div class="study-actions">
+        <button id="startStudy" type="button">开始/刷新</button>
+        <button id="showStudyAnswer" type="button">显示答案</button>
+      </div>
+      <div class="rating-row">
+        <button data-rating="0" type="button">忘了</button>
+        <button data-rating="1" type="button">模糊</button>
+        <button data-rating="2" type="button">记得</button>
+        <button data-rating="3" type="button">秒懂</button>
+      </div>
+    </section>
+
+    <div class="hud top-hud">
+      <span id="statusText">Universe LAB | 0 words | 0 connections | 0 learned</span>
+    </div>
+
+    <nav class="toolbar" aria-label="星图工具栏">
+      <button id="focusSelected" type="button" title="聚焦当前词">◎</button>
+      <button id="toggleLabels" type="button" title="显示或隐藏标签">Aa</button>
+      <button id="zoomIn" type="button" title="放大">+</button>
+      <button id="zoomOut" type="button" title="缩小">-</button>
+      <button id="homeView" type="button" title="回到全局">⌂</button>
+      <button id="shuffleView" type="button" title="重排星系">↻</button>
+    </nav>
+
+    <div class="hint">拖拽旋转星空，滚轮缩放，点击星球打开词卡</div>
+
+    <script src="./all-words-data.js"></script>
+    <script src="./app.js"></script>
+  </body>
+</html>

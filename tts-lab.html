@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Qwen3 TTS 试听调参</title>
+    <style>
+      :root {
+        color-scheme: dark;
+        --bg: #060817;
+        --panel: rgba(18, 21, 38, 0.86);
+        --line: rgba(255, 255, 255, 0.12);
+        --text: #eef3ff;
+        --muted: #aab4d2;
+        --accent: #8ff4eb;
+        --gold: #ffd86b;
+      }
+      * { box-sizing: border-box; }
+      body {
+        min-height: 100vh;
+        margin: 0;
+        display: grid;
+        place-items: center;
+        padding: 28px;
+        background:
+          radial-gradient(circle at 20% 15%, rgba(143, 244, 235, 0.16), transparent 32%),
+          radial-gradient(circle at 80% 20%, rgba(255, 216, 107, 0.12), transparent 30%),
+          var(--bg);
+        color: var(--text);
+        font-family: "Microsoft YaHei", system-ui, sans-serif;
+      }
+      main {
+        width: min(920px, 100%);
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        padding: 28px;
+        background: var(--panel);
+        box-shadow: 0 24px 90px rgba(0, 0, 0, 0.38);
+        backdrop-filter: blur(18px);
+      }
+      h1 { margin: 0 0 6px; font-size: 32px; }
+      p { color: var(--muted); line-height: 1.7; }
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 14px;
+        margin: 22px 0;
+      }
+      label { display: grid; gap: 7px; color: var(--muted); font-size: 13px; }
+      select, textarea, input {
+        width: 100%;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        padding: 11px 12px;
+        background: rgba(255, 255, 255, 0.08);
+        color: var(--text);
+        font: inherit;
+        outline: none;
+      }
+      select option { background: #161a2b; color: var(--text); }
+      textarea { min-height: 112px; resize: vertical; grid-column: 1 / -1; }
+      .actions { display: flex; gap: 12px; align-items: center; }
+      button {
+        min-height: 42px;
+        border: 1px solid rgba(143, 244, 235, 0.32);
+        border-radius: 8px;
+        padding: 0 18px;
+        background: rgba(143, 244, 235, 0.12);
+        color: var(--text);
+        cursor: pointer;
+        font-weight: 700;
+      }
+      button:hover { background: rgba(143, 244, 235, 0.2); }
+      audio { width: 100%; margin-top: 18px; }
+      pre {
+        margin-top: 16px;
+        padding: 14px;
+        border-radius: 8px;
+        overflow: auto;
+        background: rgba(0, 0, 0, 0.22);
+        color: #d9fff9;
+        white-space: pre-wrap;
+      }
+      .hint { margin-top: 10px; color: var(--gold); }
+      @media (max-width: 760px) { .grid { grid-template-columns: 1fr; } }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>Qwen3 TTS 试听调参</h1>
+      <p>建议优先试支持指令控制的 Instruct 模型音色。Jennifer 可试，但它通常走 Flash 模型，语速/风格可控性弱一些。</p>
+
+      <div class="grid">
+        <label>
+          模型
+          <select id="model">
+            <option value="qwen3-tts-instruct-flash" selected>qwen3-tts-instruct-flash</option>
+            <option value="qwen3-tts-flash">qwen3-tts-flash</option>
+          </select>
+        </label>
+        <label>
+          音色
+          <select id="voice">
+            <option value="Serena" selected>Serena</option>
+            <option value="Maia">Maia</option>
+            <option value="Mia">Mia</option>
+            <option value="Cherry">Cherry</option>
+            <option value="Elias">Elias</option>
+            <option value="Neil">Neil</option>
+            <option value="Jennifer">Jennifer</option>
+          </select>
+        </label>
+        <label>
+          语速
+          <select id="speed">
+            <option value="very-slow">很慢</option>
+            <option value="slow" selected>偏慢</option>
+            <option value="normal">正常</option>
+            <option value="brisk">稍快</option>
+          </select>
+        </label>
+        <label>
+          快捷推荐
+          <select id="preset">
+            <option value="Serena|qwen3-tts-instruct-flash|slow" selected>Serena 慢速清晰</option>
+            <option value="Maia|qwen3-tts-instruct-flash|slow">Maia 柔和清晰</option>
+            <option value="Mia|qwen3-tts-instruct-flash|very-slow">Mia 很慢学习感</option>
+            <option value="Cherry|qwen3-tts-instruct-flash|slow">Cherry 稳定女声</option>
+            <option value="Jennifer|qwen3-tts-flash|normal">Jennifer 原生音色</option>
+          </select>
+        </label>
+        <label style="grid-column: 1 / -1">
+          试听文本
+          <textarea id="text">She looked radiant in her new dress, and everyone noticed her bright smile.</textarea>
+        </label>
+        <label style="grid-column: 1 / -1">
+          额外风格指令
+          <input id="style" value="Pause slightly after commas. Put gentle stress on the key vocabulary word." />
+        </label>
+      </div>
+
+      <div class="actions">
+        <button id="preview">生成并试听</button>
+        <span id="status" class="hint"></span>
+      </div>
+      <audio id="audio" controls></audio>
+      <pre id="result"></pre>
+    </main>
+
+    <script>
+      const $ = (id) => document.getElementById(id);
+      $("preset").addEventListener("change", () => {
+        const [voice, model, speed] = $("preset").value.split("|");
+        $("voice").value = voice;
+        $("model").value = model;
+        $("speed").value = speed;
+      });
+      $("preview").addEventListener("click", async () => {
+        $("status").textContent = "生成中...";
+        $("result").textContent = "";
+        try {
+          const response = await fetch("./api/tts-preview", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              text: $("text").value,
+              model: $("model").value,
+              voice: $("voice").value,
+              speed: $("speed").value,
+              style: $("style").value,
+            }),
+          });
+          const data = await response.json();
+          if (!response.ok) throw new Error(data.error || "生成失败");
+          $("audio").src = data.url;
+          $("audio").play().catch(() => {});
+          $("status").textContent = data.cached ? "已使用缓存" : "生成成功";
+          $("result").textContent = JSON.stringify(data, null, 2);
+        } catch (error) {
+          $("status").textContent = error.message;
+        }
+      });
+    </script>
+  </body>
+</html>
