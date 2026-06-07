@@ -1,12 +1,12 @@
-# Vocab Universe
+# 红宝书词汇星空
 
-红宝书考研词汇星空是一个本地优先的考研英语背单词系统。它把单词组织成可交互的星空：单元或主题是星系，单词是星球、星云或恒星；同时提供每日学习、复习队列、拼写检查、词义辨析和读音辨词等卡片模式。
+红宝书词汇星空是一个本地优先的考研英语背单词系统。它把单词组织成可交互的星空：单元或主题是星系，单词是星球、星云或恒星；同时提供每日学习、复习队列、拼写检查、词义辨析和读音辨词等卡片模式。
 
-## Features
+## ✨ 功能概览
 
 - 星空词库浏览：按 `Unit` 或固定主题聚类，点击星系聚焦，点击单词打开词卡。
 - 红宝书词汇导入：支持 CSV 增量导入，按单词唯一键新增或更新。
-- SQLite 后端：轻量级本地数据库保存词库、已学状态和复习进度。
+- SQLite 本地后端：用轻量级数据库保存词库、已学状态和复习进度。
 - 学习模式 2.0：支持每日新词目标、复习上限和基于记忆曲线的复习调度。
 - 独立题型模式：翻卡、词辨意、意辨词、拼写检查、读音辨词可以单独选择。
 - 完整释义：保留简短释义 `meaning`，同时使用 `meaning_full` 覆盖多词性和常用义项。
@@ -15,72 +15,79 @@
 - TTS 调参页：保留 `tts-lab.html`，方便试听不同模型、音色和风格指令。
 - 文件同步：数据库会同步到 `all-words.csv` 和 `all-words-data.js`，便于备份和静态回退。
 
-## Project Layout
+## 🧭 项目结构
 
 ```text
 .
-├── app.js                         # Frontend interaction, star map, study cards
-├── index.html                     # Main app
-├── styles.css                     # UI and star-map styling
-├── server.cjs                     # Local HTTP server, SQLite APIs, TTS/audio APIs
-├── all-words.csv                  # Synced word-bank CSV
-├── all-words-data.js              # Static fallback word data
-├── redbook-vocab-template.csv     # CSV import template
-├── tts-lab.html                   # Qwen/OpenAI TTS test page
-├── download-audio.cjs             # Batch word-audio downloader
-├── enrich-meanings.cjs            # Fill meaning_full with Qwen
-├── retag-themes.cjs               # Rebuild fixed theme categories
-└── start-vocab-universe.bat       # Windows start helper
+├── app.js                         # 前端交互、星空绘制、学习卡片
+├── index.html                     # 主页面
+├── styles.css                     # 页面样式和星空视觉
+├── server.cjs                     # 本地 HTTP 服务、SQLite 接口、TTS/音频接口
+├── all-words.csv                  # 同步出来的总词库 CSV
+├── all-words-data.js              # 静态回退词库数据
+├── redbook-vocab-template.csv     # CSV 导入模板
+├── tts-lab.html                   # Qwen/OpenAI TTS 试听调参页
+├── download-audio.cjs             # 批量下载单词发音脚本
+├── enrich-meanings.cjs            # 使用 Qwen 补全 meaning_full 的脚本
+├── retag-themes.cjs               # 重新生成固定主题分类的脚本
+└── start-vocab-universe.bat       # Windows 启动脚本
 ```
 
-Runtime folders are ignored by Git:
+运行时目录不会提交到 Git：
 
 ```text
-data/                              # SQLite database
-audio/default/                     # Google/Oxford word audio cache
-audio/us/                          # Legacy/fallback word audio cache
-audio/tts/                         # Generated word TTS cache
-audio/sentences/                   # Generated example sentence audio
-audio/preview/                     # TTS lab preview audio
+data/                              # SQLite 数据库
+audio/default/                     # Google/Oxford 单词音频缓存
+audio/us/                          # 旧版或备用美音缓存
+audio/tts/                         # 单词 TTS 缓存
+audio/sentences/                   # 例句 TTS 缓存
+audio/preview/                     # TTS 调参页试听缓存
 ```
 
-## Requirements
+## 🛠️ 运行环境
 
-- Windows, macOS, or Linux
-- Node.js 22+ recommended
-- No npm install is required for the current implementation
+- Windows、macOS 或 Linux
+- 推荐 Node.js 22 及以上
+- 当前版本不需要执行 `npm install`
 
-The server uses Node built-ins, including `node:sqlite`, so use a modern Node version. The project was developed with Node 24.
+项目使用了 Node 内置能力，包括 `node:sqlite`，所以建议使用较新的 Node 版本。开发时使用的是 Node 24。
 
-## Quick Start
+## 🚀 快速启动
+
+进入项目目录：
 
 ```powershell
 cd D:\vocab-universe
+```
+
+启动本地服务：
+
+```powershell
 node server.cjs
 ```
 
-Open:
+然后打开：
 
 ```text
 http://localhost:5173/
 ```
 
-On Windows, you can also run:
+Windows 下也可以直接运行：
 
 ```powershell
 .\start-vocab-universe.bat
 ```
 
-## TTS Configuration
+## 🔊 TTS 配置
 
-Example sentence audio defaults to Qwen3-TTS. Set your API key before starting the server:
+例句音频默认使用 Qwen3-TTS。启动服务前需要设置环境变量：
 
 ```powershell
-$env:DASHSCOPE_API_KEY="your_dashscope_api_key"
+$env:DASHSCOPE_API_KEY="你的 DashScope API Key"
 node server.cjs
 ```
 
-Current recommended Qwen sentence settings:
+当前推荐的 Qwen 例句配置：
 
 ```powershell
 $env:QWEN_TTS_MODEL="qwen3-tts-instruct-flash"
@@ -88,131 +95,130 @@ $env:QWEN_TTS_VOICE="Maia"
 $env:DASHSCOPE_BASE_URL="https://dashscope.aliyuncs.com"
 ```
 
-The app sends an instruction similar to:
+当前例句 TTS 的风格指令大致是：
 
 ```text
-Deliver the text in General Canadian English with perfect native pronunciation.
-Maintain a professional yet warm tone with authentic Canadian rhythm and intonation.
-Avoid any unnatural robotic shifts. Pause slightly after commas.
-Put gentle stress on the key vocabulary word.
+使用标准加拿大英语朗读，发音准确自然。
+保持专业但温暖的语气，节奏自然，不要机械或夸张。
+逗号后稍作停顿，并对关键词给出轻微重音。
 ```
 
-OpenAI TTS is still available if configured:
-
-```powershell
-$env:OPENAI_API_KEY="your_openai_api_key"
-$env:OPENAI_TTS_MODEL="gpt-4o-mini-tts"
-$env:OPENAI_TTS_VOICE="alloy"
-```
-
-Use the test page to compare voices and speed:
+如果想继续测试不同音色，可以打开：
 
 ```text
 http://localhost:5173/tts-lab.html
 ```
 
-## Word Audio Strategy
+OpenAI TTS 也保留了入口。如果需要使用，需要设置：
 
-Single-word pronunciation does not use Qwen by default. The app follows this order:
+```powershell
+$env:OPENAI_API_KEY="你的 OpenAI API Key"
+$env:OPENAI_TTS_MODEL="gpt-4o-mini-tts"
+$env:OPENAI_TTS_VOICE="alloy"
+```
 
-1. Local cached default audio in `audio/default/`
-2. Google/Oxford dictionary audio
-3. Local fallback audio in `audio/us/`
-4. Browser/system speech synthesis as the last fallback
+## 🎧 单词发音策略
 
-When Google/Oxford audio is found, it is cached locally, so later playback is fast and offline-friendly.
+单词发音默认不使用 Qwen TTS。当前顺序是：
 
-## CSV Import
+1. 优先读取 `audio/default/` 中已经缓存的默认发音。
+2. 如果没有缓存，尝试获取 Google/Oxford 词典发音。
+3. 如果仍然没有，读取 `audio/us/` 中的备用发音。
+4. 最后再退回浏览器或系统自带发音。
 
-Import uses CSV and merges incrementally by normalized word key. Re-importing the same word updates that word instead of duplicating it.
+只要 Google/Oxford 发音获取成功，就会缓存到本地，后续播放会更快，也能减少重复请求。
 
-Recommended columns:
+## 📥 CSV 导入
+
+导入使用 CSV，并且按单词唯一键做增量合并。重复导入同一个单词时，会更新这个单词，不会重复追加。
+
+推荐字段：
 
 ```csv
 word,phonetic,meaning,meaning_full,unit,theme,root,parts,memory,related,example_en,example_zh,pronunciation_text
 ```
 
-Column notes:
+字段说明：
 
-- `word`: required; used as the unique key after normalization.
-- `phonetic`: American phonetic symbol preferred.
-- `meaning`: short meaning for compact list usage.
-- `meaning_full`: full common meanings with parts of speech; used by study cards.
-- `unit`: such as `Unit 01 必考词`.
-- `theme`: one of the fixed theme categories, or your custom category before retagging.
-- `root`: word root shown in the left list.
-- `parts`: split morphemes with `|`, for example `radi 光线|-ate 动词后缀`.
-- `memory`: memory story or note.
-- `related`: related words separated by `|`.
-- `example_en`: English example sentence.
-- `example_zh`: Chinese translation.
-- `pronunciation_text`: optional lookup text for unusual word forms.
+- `word`：必填，单词本身，归一化后作为唯一键。
+- `phonetic`：音标，优先填写美式音标。
+- `meaning`：简短释义，用于列表等紧凑展示。
+- `meaning_full`：完整释义，用于学习卡片和复习题型，建议覆盖常见词性和高频义项。
+- `unit`：单元，例如 `Unit 01 必考词`。
+- `theme`：主题分类，可以先自定义，之后再用脚本统一重分类。
+- `root`：词根或左侧列表中展示的短标签。
+- `parts`：词源拆解，用 `|` 分隔，例如 `radi 光线|-ate 动词后缀`。
+- `memory`：记忆故事或助记说明。
+- `related`：关联词，用 `|` 分隔。
+- `example_en`：英文例句。
+- `example_zh`：例句中文翻译。
+- `pronunciation_text`：可选，用于特殊词形的发音查找。
 
-## Data Flow
+## 🗃️ 数据流
 
-The app is local-first:
+这个项目是本地优先的：
 
-1. Server reads SQLite from `data/vocab.sqlite`.
-2. On startup, `all-words.csv` is merged into SQLite if present.
-3. SQLite is the runtime source of truth.
-4. After imports or server sync, data is written back to:
+1. 服务端读取 `data/vocab.sqlite`。
+2. 如果存在 `all-words.csv`，启动或访问接口时会尝试合并进 SQLite。
+3. 运行时以 SQLite 作为主要数据源。
+4. 导入或同步后，会重新写出：
    - `all-words.csv`
    - `all-words-data.js`
 
-This lets you keep a portable CSV backup while still using a fast local database.
+这样既能使用数据库带来的稳定性，也保留了 CSV 的可迁移和可备份能力。
 
-## Study Modes
+## 🧠 学习模式
 
-The learning panel supports separate modes:
+学习面板目前支持五种独立题型：
 
-- `翻卡`: see the word, recall the meaning, reveal answer, then self-rate.
-- `词辨意`: choose the correct meaning for a word.
-- `意辨词`: choose the correct word for a meaning.
-- `拼写检查`: type the word from a meaning prompt.
-- `读音辨词`: hear pronunciation and choose the word.
+- `翻卡`：看到单词后先回忆释义，再显示答案并自评。
+- `词辨意`：根据单词选择正确释义。
+- `意辨词`：根据释义选择正确单词。
+- `拼写检查`：根据释义输入英文单词。
+- `读音辨词`：听发音并选择对应单词。
 
-Only one question mode is active at a time. This keeps review sessions focused instead of mixing tasks unexpectedly.
+一次只启用一种题型。这样复习时不会把几种任务混在一起，学习目标会更清晰。
 
-## Review Scheduling
+## 🔁 复习调度
 
-The backend stores review state in `word_progress` and `review_logs`.
+后端通过 `word_progress` 和 `review_logs` 保存学习状态。
 
-The scheduler is a lightweight SM-2/FSRS-inspired system:
+当前调度逻辑是一个轻量级的 SM-2/FSRS 风格算法：
 
-- New words enter the daily queue according to `daily_new`.
-- Due review words are prioritized before new words.
-- Ratings update difficulty, stability, streak, review count, and next due time.
-- Higher ratings push the next review farther into the future.
-- Failed answers return sooner.
+- 新词按照每日新词目标进入学习队列。
+- 到期复习词优先于新词。
+- 每次答题会更新难度、稳定度、连续正确次数、复习次数和下次复习时间。
+- 答得越稳，下次复习间隔越长。
+- 答错或模糊的单词会更快回到复习队列。
 
-The goal is practical local study behavior without adding a heavy dependency.
+这个实现的目标是保持实用和轻量，不引入复杂依赖。
 
-## Maintenance Scripts
+## 🧩 维护脚本
 
-Fill full meanings for words missing `meaning_full`:
+补全缺失的完整释义：
 
 ```powershell
-$env:DASHSCOPE_API_KEY="your_dashscope_api_key"
+$env:DASHSCOPE_API_KEY="你的 DashScope API Key"
 node enrich-meanings.cjs
 ```
 
-Rebuild fixed theme categories:
+重新整理固定主题：
 
 ```powershell
 node retag-themes.cjs
 ```
 
-Batch download word audio:
+批量下载单词发音：
 
 ```powershell
 node download-audio.cjs
 ```
 
-## Reset And Cache Cleanup
+## 🧹 缓存与重置
 
-The UI has a clear-cache button. It is designed to remove generated local files and cached frontend state while keeping the database logic separate.
+页面中提供了清除缓存按钮。它用于清理生成文件和前端缓存，数据库逻辑单独处理。
 
-Generated files and folders you may remove manually if needed:
+如果需要手动清理，可以删除这些内容：
 
 ```text
 data/
@@ -225,25 +231,31 @@ all-words.csv
 all-words-data.js
 ```
 
-If you delete SQLite but keep CSV files, the server can rebuild the database from `all-words.csv`.
+注意：如果删除 SQLite 但保留 `all-words.csv`，服务端可以从 CSV 重新构建数据库。
 
-## Git Notes
+## 🔐 Git 与安全
 
-The repository intentionally tracks source code, templates, and the synced CSV/JS word bank. It ignores:
+仓库会提交源码、导入模板和同步词库文件，但不会提交：
 
-- SQLite runtime database
-- Generated audio
-- Local API keys
-- Editor and OS files
+- SQLite 运行时数据库
+- 生成的音频缓存
+- `.env` 或本地 API Key
+- 编辑器和系统临时文件
 
-Do not commit `.env` files or API keys.
+请不要把 API Key、私人令牌或 `.env` 文件提交到仓库。
 
-## Troubleshooting
+## ❓ 常见问题
 
-If the browser reports CORS errors for `file://` URLs, run the local server and open `http://localhost:5173/`. Modern browsers block `fetch()` from local files.
+如果浏览器在 `file://` 页面下报 CORS 错误，请启动本地服务并打开：
 
-If TTS fails, check that `DASHSCOPE_API_KEY` or `OPENAI_API_KEY` is set in the same terminal session used to start `server.cjs`.
+```text
+http://localhost:5173/
+```
 
-If imported Chinese text becomes garbled, save CSV as UTF-8 with BOM or UTF-8. The server also attempts GB18030 decoding for older spreadsheet exports.
+现代浏览器会限制本地文件直接 `fetch()`，所以正式使用时建议始终通过本地服务访问。
 
-If repeated imports create unexpected data, check that the `word` column is stable. Incremental merge is based on normalized `word`.
+如果 TTS 失败，请确认 `DASHSCOPE_API_KEY` 或 `OPENAI_API_KEY` 是在启动 `server.cjs` 的同一个终端会话里设置的。
+
+如果导入后中文乱码，请把 CSV 保存为 UTF-8 或 UTF-8 with BOM。服务端也会尝试兼容 GB18030 编码的旧表格导出。
+
+如果重复导入后数据异常，请检查 `word` 列是否稳定。增量合并是按归一化后的 `word` 作为唯一键。
